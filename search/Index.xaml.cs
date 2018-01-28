@@ -81,53 +81,49 @@ namespace search
             ".json", ".asp", ".aspx", ".l"
         };
 
+        lucene index = new lucene();
+        
         public Index()
         {
             InitializeComponent();
             browes_tbx.Text = "C:\\Users\\siavash\\Desktop\\iDesktop\\Sias Files\\";
             result_tbx.Text = "opening E:\\Sias Files ...\n";
-            //index_btn_Click(null, null);
-            
+            filename = string.Empty;
+            filepath = string.Empty;
         }
 
-        public void openfile()
+        public void openFilesToBeIndex()
         {
-            if (browes_tbx.Text == null)
+            bool result = false;
+            foreach (string file in Directory.EnumerateFiles(browes_tbx.Text))
             {
-                MessageBox.Show("Please select directory path", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            if (Directory.Exists(browes_tbx.Text))
-            {
-                foreach (string file in Directory.EnumerateFiles(browes_tbx.Text))
-                {
-                    fileContent.Clear();
+                fileContent.Clear();
+                filename = string.Empty;
+                filepath = string.Empty;
 
-                    if (readableFormats.Any(Path.GetExtension(file).Contains))
+                if (readableFormats.Any(Path.GetExtension(file).Contains))
+                {
+                    switch (Path.GetExtension(file))
                     {
-                        switch (Path.GetExtension(file))
-                        {
-                            case ".doc": { wordReader(file); break; }
-                            case ".docx": { wordReader(file); break; }
-                            case ".pdf": { pdfReader(file); break; }
-                            case ".ppt": { pptReader(file); break; }
-                            case ".xls": { xlsxReader(file); break; }
-                            case ".xlsx": { xlsxReader(file); break; }
-                            default: txtReader(file); break;
-                        }
+                        case ".doc": { wordReader(file); break; }
+                        case ".docx": { wordReader(file); break; }
+                        case ".pdf": { pdfReader(file); break; }
+                        case ".ppt": { pptReader(file); break; }
+                        case ".xls": { xlsxReader(file); break; }
+                        case ".xlsx": { xlsxReader(file); break; }
+                        default: txtReader(file); break;
                     }
-                    else
-                    {
-                        filename = Path.GetFileName(file) + Path.GetExtension(file);
-                        filepath = file;
-                        fileContent.Append("");
-                    }
-                    show(Path.GetFileName(file));
                 }
-            }
-            else
-            {
-                MessageBox.Show(string.Format("{0} Directory does not exist!", browes_tbx.Text));
+                else
+                {
+                    fileContent.Append("");
+                }
+
+                filename = Path.GetFileName(file) + Path.GetExtension(file);
+                filepath = file;
+
+                result = index.lucene_index(filepath, filename, fileContent);
+                result_tbx.Text = file + "\t\t\t\t" + result;
             }
         }
 
@@ -157,10 +153,8 @@ namespace search
             fileContent.Append("still in process ... ");
         }
 
-
         public void txtReader(string path)
         {
-            //fileContent = File.ReadAllText(path);
             //used from this side 
             //https://www.dotnetperls.com/file-readalltext
             using (StreamReader reader = new StreamReader(path))
@@ -176,11 +170,20 @@ namespace search
 
         private void index_btn_Click(object sender, RoutedEventArgs e)
         {
-            luceneIndex l = new luceneIndex();
-            string s = l.lucene_index();
-            result_tbx.Text = "*******search result*******\n" + s;
-            //openfile();
-
+            if (browes_tbx.Text == null)
+            {
+                MessageBox.Show("Please select directory path", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            else if (!Directory.Exists(browes_tbx.Text))
+            {
+                MessageBox.Show(string.Format("{0} Directory does not exist!", browes_tbx.Text));
+                return;
+            }
+            else
+            {
+                openFilesToBeIndex();
+            }
         }
 
         private void browes_tbx_KeyDown(object sender, KeyEventArgs e)

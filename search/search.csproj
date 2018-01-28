@@ -79,7 +79,7 @@
     <Compile Include="Index.xaml.cs">
       <DependentUpon>Index.xaml</DependentUpon>
     </Compile>
-    <Compile Include="luceneIndex.cs" />
+    <Compile Include="lucene.cs" />
     <Compile Include="Search.xaml.cs">
       <DependentUpon>Search.xaml</DependentUpon>
     </Compile>
