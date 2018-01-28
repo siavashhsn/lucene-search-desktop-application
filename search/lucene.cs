@@ -29,18 +29,28 @@ namespace search
         {
             analyzer = new StandardAnalyzer(Version.LUCENE_30);
             directory = FSDirectory.Open(new DirectoryInfo(Environment.CurrentDirectory + "\\LuceneIndex"));
+        }
+
+        public void indexStart()
+        {
             writer = new IndexWriter(directory, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+        }
+
+        public void searchStart()
+        {
             reader = IndexReader.Open(directory, true);
             searcher = new IndexSearcher(reader);
         }
-
-        public void writerclose()
+        public void indexClose()
+        {
+            writer.Optimize();
+            writer.Dispose();
+            analyzer.Close();
+        }
+        public void searchClose()
         {
             reader.Dispose();
-            writer.Dispose();
-        }
-        public void analyzerClose()
-        {
+            searcher.Dispose();
             analyzer.Close();
         }
 
@@ -53,7 +63,6 @@ namespace search
                 doc.Add(new Field("name", name.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
                 doc.Add(new Field("content", content.ToString(), Field.Store.YES, Field.Index.ANALYZED));
                 writer.AddDocument(doc);
-                writer.Optimize();
                 return true;
             }
             catch (Exception e)
@@ -63,21 +72,20 @@ namespace search
             }
         }
 
-        public List<Tuple<string, string>> lucene_search(string query)
+        public List<Tuple<string, Tuple<string, string>>> lucene_search(string query)
         {
-            writerclose();
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_30, new string[] { "name", "content" }, analyzer);
             TopDocs resultDocs = searcher.Search(queryParser.Parse(query), 10);
             var hits = resultDocs.ScoreDocs;
 
-            List<Tuple<string, string>> s = new List<Tuple<string, string>>();
+            List<Tuple<string, Tuple<string, string>>> s = new List<Tuple<string, Tuple<string, string>>>();
             foreach (var hit in hits)
             {
                 var documentfromsearch = searcher.Doc(hit.Doc);
-                s.Add(Tuple.Create(documentfromsearch.Get("path"), documentfromsearch.Get("name")));
+                s.Add(Tuple.Create(documentfromsearch.Get("path"), Tuple.Create(documentfromsearch.Get("name"), documentfromsearch.Get("content"))));
             }
             searcher.Dispose();
             return s;
         }
     }
-}
+}   

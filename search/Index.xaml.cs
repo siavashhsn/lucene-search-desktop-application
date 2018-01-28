@@ -76,7 +76,7 @@ namespace search
             ".dotx", ".html", ".pdf", ".ppa", ".txt",
             ".xml", ".xhtml", ".php", ".pl", ".py", ".y",
             ".r", ".rb", ".c", ".cpp", ".cc", ".cxx", ".vb",
-            ".h", ".hpp", ".hxx", ".ml", ".php", ".css",
+            ".h", ".hpp", ".hxx", ".ml", ".php", ".css", ".cs",
             ".php3", ".php4", ".php5", ".phps", ".phtml",
             ".json", ".asp", ".aspx", ".l"
         };
@@ -111,7 +111,7 @@ namespace search
                         case ".ppt": { pptReader(file); break; }
                         case ".xls": { xlsxReader(file); break; }
                         case ".xlsx": { xlsxReader(file); break; }
-                        default: txtReader(file); break;
+                        default: { txtReader(file); break; }
                     }
                 }
                 else
@@ -119,11 +119,11 @@ namespace search
                     fileContent.Append("");
                 }
 
-                filename = Path.GetFileName(file) + Path.GetExtension(file);
+                filename = Path.GetFileName(file);
                 filepath = file;
 
                 result = index.lucene_index(filepath, filename, fileContent);
-                result_tbx.Text = file + "\t\t\t\t" + result;
+                result_tbx.Text += file + "\t\t\t\t" + result + "\n";
             }
         }
 
@@ -145,12 +145,12 @@ namespace search
 
         public void pptReader(string path)
         {
-            fileContent.Append("still in process ... ");
+            result_tbx.Text +=  "still in process ... ";
         }
 
         public void xlsxReader(string path)
         {
-            fileContent.Append("still in process ... ");
+            result_tbx.Text += "still in process ... ";
         }
 
         public void txtReader(string path)
@@ -182,7 +182,11 @@ namespace search
             }
             else
             {
+                index.indexStart();
                 openFilesToBeIndex();
+                index.indexClose();
+
+                result_tbx.Text += "\n...................done...................\n";
             }
         }
 
