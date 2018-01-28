@@ -20,6 +20,8 @@ namespace search
     public partial class Index : Window
     {
         public static StringBuilder fileContent = new StringBuilder();
+        public static string filename;
+        public static string filepath;
 
         public static string[] vidioAudioFormats = new[] 
         {
@@ -116,7 +118,9 @@ namespace search
                     }
                     else
                     {
-                        nameReader(file);
+                        filename = Path.GetFileName(file) + Path.GetExtension(file);
+                        filepath = file;
+                        fileContent.Append("");
                     }
                     show(Path.GetFileName(file));
                 }
@@ -153,10 +157,6 @@ namespace search
             fileContent.Append("still in process ... ");
         }
 
-        public void nameReader(string path)
-        {
-            fileContent.Append(Path.GetFileName(path) + Path.GetExtension(path));
-        }
 
         public void txtReader(string path)
         {

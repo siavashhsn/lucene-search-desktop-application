@@ -29,54 +29,45 @@ namespace search
             analyzer = new StandardAnalyzer(Version.LUCENE_30);
             directory = FSDirectory.Open(new DirectoryInfo(Environment.CurrentDirectory + "\\LuceneIndex"));
             writer = new IndexWriter(directory, analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
-           
-        }
-
-        public void opensercher()
-        {
             reader = IndexReader.Open(directory, true);
             searcher = new IndexSearcher(reader);
         }
-
+        
         public void writerclose()
         {
-            analyzer.Close();
+            reader.Dispose();
             writer.Dispose();
         }
-
-        //var fordFiesta = new Document();
-        //fordFiesta.Add(new Field("Id", "1", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        //fordFiesta.Add(new Field("Make", "ford", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        //fordFiesta.Add(new Field("Model", "Fiesta", Field.Store.YES, Field.Index.NOT_ANALYZED));
-
-        //var vauxhallAstra = new Document();
-        //vauxhallAstra.Add(new Field("Id", "2", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        //vauxhallAstra.Add(new Field("Make", "Vauxhall", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        //vauxhallAstra.Add(new Field("Model", "Astra", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        public void lucene_index(Document doc)
+        public void analyzerClose()
         {
+            analyzer.Close();
+        }
+
+        public void lucene_index(string path, string name, StringBuilder content)
+        {
+            var doc = new Document();
+            doc.Add(new Field("path", path, Field.Store.YES, Field.Index.NO));
+            doc.Add(new Field("name", name.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
+            doc.Add(new Field("content", content.ToString(), Field.Store.YES, Field.Index.ANALYZED));
             writer.AddDocument(doc);
             writer.Optimize();
         }
-
-    
-
-        public void lucene_search()
+        
+        public List<Tuple<string, string>> lucene_search(string query)
         {
-            //var queryParser = new QueryParser(Version.LUCENE_30, "Make", analyzer);
-            //var query = queryParser.Parse("ford")
-            TopDocs resultDocs = searcher.Search(query, 1);
+            writerclose();
+            MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_30,new string[] { "name", "content" },analyzer);
+            TopDocs resultDocs = searcher.Search(queryParser.Parse(query) , 10);
             var hits = resultDocs.ScoreDocs;
 
-            string s = string.Empty;
+            List<Tuple<string, string>> s = new List<Tuple<string, string>>();
             foreach (var hit in hits)
             {
                 var documentfromsearch = searcher.Doc(hit.Doc);
-                s += documentfromsearch.Get("Make") + " " + documentfromsearch.Get("Model");
+                s.Add(Tuple.Create(documentfromsearch.Get("path"), documentfromsearch.Get("name")));
             }
+            searcher.Dispose();
+            return s;
         }
-
-        
     }
-
 }
