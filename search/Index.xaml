@@ -8,6 +8,9 @@
         mc:Ignorable="d"
         Title="Index"  Height="530.912" Width="769.2">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <Label Content="Index" HorizontalAlignment="Left" Margin="22,14,0,0" VerticalAlignment="Top" Height="72" Width="149" FontWeight="Bold" Background="White" Foreground="#FFBC1F1F" FontSize="48"/>
         <TextBox Name="browes_tbx" VerticalContentAlignment="Center" HorizontalAlignment="Right" Height="49" Margin="0,32,12.2,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="575" FontSize="20" KeyDown="browes_tbx_KeyDown"/>
         <Button Name="index_btn" HorizontalAlignment="Right" Margin="0,34,16.2,0" VerticalAlignment="Top" Width="46" Height="45" Background="White" BorderBrush="White" Click="index_btn_Click">

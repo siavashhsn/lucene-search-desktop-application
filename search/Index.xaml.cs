@@ -11,6 +11,7 @@ using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 using Code7248.word_reader;
 using System.Text;
+using System.Threading;
 
 namespace search
 {
@@ -22,8 +23,11 @@ namespace search
         public static StringBuilder fileContent = new StringBuilder();
         public static string filename;
         public static string filepath;
+        private SynchronizationContext MainThread;
+        private Thread openfilethread;
 
-        public static string[] vidioAudioFormats = new[] 
+
+        public static string[] vidioAudioFormats = new[]
         {
             ".webm", ".mpg", ".mp2", ".mpeg", ".mpe",
             ".mpv", ".ogg", ".mp4", ".m4p", ".m4v",
@@ -38,7 +42,7 @@ namespace search
             ".pgm", ".png", ".ppm", ".psd", ".ras",
             ".tga", ".tiff", ".wmf", ".gif"
         };
-        
+
         public static string[] archiveformats = new[]
         {
             ".bz2",".F",".gz",".lz",".lzma",".lzo",
@@ -82,7 +86,7 @@ namespace search
         };
 
         lucene index = new lucene();
-        
+
         public Index()
         {
             InitializeComponent();
@@ -90,32 +94,39 @@ namespace search
             result_tbx.Text = "opening iDesktop ...\n";
             filename = string.Empty;
             filepath = string.Empty;
+            MainThread = SynchronizationContext.Current;
+            if (MainThread == null) MainThread = new SynchronizationContext();
         }
 
         public void openFilesToBeIndex()
         {
-            index_btn.IsEnabled = false;
-            bool result = false;
-            string[] entries = Directory.GetFileSystemEntries(browes_tbx.Text, "*", SearchOption.AllDirectories);
-            foreach (string file in entries)
-            {
-                if (File.Exists(file))
-                {
-                    fileContent.Clear();
-                    filename = string.Empty;
-                    filepath = string.Empty;
+            index.indexStart();
 
-                    if (readableFormats.Any(Path.GetExtension(file).Contains))
+            MainThread.Send((object state) =>
+            {
+
+                index_btn.IsEnabled = false;
+                bool result = false;
+
+                string[] entries = Directory.GetFileSystemEntries(browes_tbx.Text, "*", SearchOption.AllDirectories);
+                foreach (string file in entries)
+                {
+                    if (File.Exists(file))
                     {
-                        switch (Path.GetExtension(file))
+                        fileContent.Clear();
+                        filename = string.Empty;
+                        filepath = string.Empty;
+
+                        if (readableFormats.Any(Path.GetExtension(file).Contains))
                         {
-                            case ".doc": { wordReader(file); break; }
-                            case ".docx": { wordReader(file); break; }
-                            case ".pdf": { pdfReader(file); break; }
-                            case ".ppt": { pptReader(file); break; }
-                            case ".xls": { xlsxReader(file); break; }
-                            case ".xlsx": { xlsxReader(file); break; }
-                            default: { txtReader(file); break; }
+                            string fx = Path.GetExtension(file);
+                            if (fx == ".doc") { wordReader(file); }
+                            else if (fx == ".docx") { wordReader(file); }
+                            else if (fx == ".pdf") { pdfReader(file); }
+                            else if (fx == ".ppt") { pptReader(file); }
+                            else if (fx == ".xls") { xlsxReader(file); }
+                            else if (fx == ".xlsx") { xlsxReader(file); }
+                            else { txtReader(file); }
                         }
                     }
                     else
@@ -126,19 +137,31 @@ namespace search
                     filename = Path.GetFileName(file);
                     filepath = file;
 
+
                     result = index.lucene_index(filepath, filename, fileContent);
-                    show(result);
+
+                    if (result)
+                        result_tbx.Text += "Indexed \t" + filename + "\n";
+                    else
+                        result_tbx.Text += "not Indexed \t" + filename + "\n";
                     result_tbx.ScrollToEnd();
                 }
-            }
+            }, null);
+            index.indexClose();
         }
+
 
         public void show(bool r)
         {
-            if (r)
-                result_tbx.Text += "Indexed \t" + filename + "\n";
-            else
-                result_tbx.Text += "not Indexed \t" + filename + "\n";
+            MainThread.Send((object state) =>
+            {
+                if (r)
+                    result_tbx.Text += "Indexed \t" + filename + "\n";
+                else
+                    result_tbx.Text += "not Indexed \t" + filename + "\n";
+                result_tbx.ScrollToEnd();
+
+            }, r);
 
         }
 
@@ -160,7 +183,7 @@ namespace search
 
         public void pptReader(string path)
         {
-            result_tbx.Text +=  "still in process ... ";
+            result_tbx.Text += "still in process ... ";
         }
 
         public void xlsxReader(string path)
@@ -197,10 +220,8 @@ namespace search
             }
             else
             {
-                index.indexStart();
-                openFilesToBeIndex();
-                index.indexClose();
-
+                openfilethread = new Thread(new ThreadStart(openFilesToBeIndex));
+                openfilethread.Start();
                 result_tbx.Text += "\n...................done...................\n";
             }
             return;
@@ -212,6 +233,6 @@ namespace search
             {
                 index_btn_Click(this, e);
             }
-        }   
+        }
     }
 }

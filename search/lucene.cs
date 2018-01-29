@@ -74,18 +74,26 @@ namespace search
 
         public List<Tuple<string, string>> lucene_search(string query)
         {
-            MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_30, new string[] { "name", "content" }, analyzer);
-            TopDocs resultDocs = searcher.Search(queryParser.Parse(query), 100);
-            var hits = resultDocs.ScoreDocs;
-
-            List<Tuple<string, string>> s = new List<Tuple<string, string>>();
-            foreach (var hit in hits)
+            try
             {
-                var documentfromsearch = searcher.Doc(hit.Doc);
-                s.Add(Tuple.Create(documentfromsearch.Get("path"), documentfromsearch.Get("name")));
+                MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_30, new string[] { "name", "content" }, analyzer);
+                TopDocs resultDocs = searcher.Search(queryParser.Parse(query), 100);
+                var hits = resultDocs.ScoreDocs;
+
+                List<Tuple<string, string>> s = new List<Tuple<string, string>>();
+                foreach (var hit in hits)
+                {
+                    var documentfromsearch = searcher.Doc(hit.Doc);
+                    s.Add(Tuple.Create(documentfromsearch.Get("path"), documentfromsearch.Get("name")));
+                }
+                searcher.Dispose();
+                return s;
             }
-            searcher.Dispose();
-            return s;
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
+                return null;
+            }
         }
     }
 }   

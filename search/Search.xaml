@@ -16,12 +16,12 @@
         </Button>
         <ListView Name="result_ltv"
                   HorizontalAlignment="Right"
-                  AlternationCount="50"
+                  AlternationCount="101"
                   Height="380" Margin="10,100,8,0"
                   VerticalAlignment="Top" Width="722">
             <ListView.View>
                 <GridView AllowsColumnReorder="true">
-                    <GridViewColumn  Header="#" Width="22" 
+                    <GridViewColumn  Header="#" Width="30" 
                                      DisplayMemberBinding = "{Binding (ItemsControl.AlternationIndex),RelativeSource = {RelativeSource AncestorType=ListViewItem}}" />
                     <GridViewColumn  Header="File Name" Width="194" DisplayMemberBinding="{Binding name}" />
                     <GridViewColumn  Header="File Path" Width="500" DisplayMemberBinding="{Binding path}" />

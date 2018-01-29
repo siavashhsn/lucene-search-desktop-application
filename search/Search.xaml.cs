@@ -29,16 +29,19 @@ namespace search
             lucene lucenesearch = new lucene();
             lucenesearch.searchStart();
             list = lucenesearch.lucene_search(search_tbx.Text.ToLower());
-            foreach (var item in list)
+            if (list != null)
             {
-                listitem li = new listitem();
-                li.name = item.Item2;
-                li.path = item.Item1;
-                l.Add(li);
-            }
+                foreach (var item in list)
+                {
+                    listitem li = new listitem();
+                    li.name = item.Item2;
+                    li.path = item.Item1;
+                    l.Add(li);
+                }
 
-            result_ltv.ItemsSource = l;
-            lucenesearch.searchClose();
+                result_ltv.ItemsSource = l;
+                lucenesearch.searchClose();
+            }
 
         }
 
