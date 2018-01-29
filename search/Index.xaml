@@ -9,9 +9,9 @@
         Title="Index"  Height="530.912" Width="748.8">
     <Grid>
 
-        <Grid HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="742" Background="#FFEAEAEA">
-            <Label Content="Write address to be indexed!" HorizontalAlignment="Left" Margin="10,34,0,0" VerticalAlignment="Top" Height="47" Width="259" FontWeight="Bold" Background="#FFEAEAEA" Foreground="#FFBC1F1F" FontSize="19"/>
-            <TextBox Name="browes_tbx" HorizontalAlignment="Left" Height="49" Margin="274,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="434" FontSize="30" KeyDown="browes_tbx_KeyDown"/>
+        <Grid HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="742" Background="White">
+            <Label Content="Index" HorizontalAlignment="Left" Margin="16,14,0,0" VerticalAlignment="Top" Height="72" Width="149" FontWeight="Bold" Background="White" Foreground="#FFBC1F1F" FontSize="48"/>
+            <TextBox Name="browes_tbx" HorizontalAlignment="Left" Height="49" Margin="170,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="538" FontSize="30" KeyDown="browes_tbx_KeyDown"/>
             <Button Name="index_btn" HorizontalAlignment="Left" Margin="660,34,0,0" VerticalAlignment="Top" Width="46" Height="45" Background="White" BorderBrush="White" Click="index_btn_Click">
                 <fa:ImageAwesome Icon="ListUl" Width="30" Height="30"/>
             </Button>
@@ -20,7 +20,7 @@
             Name="result_tbx" HorizontalAlignment="Left"
             IsReadOnly="True"
             VerticalAlignment="Top" Height="376" Width="732"
-            Background="Black" Foreground="#FF00E203"
+            Background="#FF772953" Foreground="White"
             FontSize="18" Margin="0,116,0,0"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto"

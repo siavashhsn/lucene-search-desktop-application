@@ -6,24 +6,32 @@
         xmlns:local="clr-namespace:search"
         xmlns:fa="http://schemas.fontawesome.io/icons/" 
         mc:Ignorable="d"
-        Title="Search"  Height="522" Width="748.8">
+        Title="Search"  Height="568.8" Width="746.4">
     <Grid>
-        <Grid HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="742" Background="#FF7CB4FA">
-            <Label Content="Search any thing!" HorizontalAlignment="Left" Margin="24,34,0,0" VerticalAlignment="Top" FontSize="21" Height="47" Width="183" FontWeight="Bold" Background="#FFEAEAEA" Foreground="#FFBC1F1F"/>
-            <TextBox Name="search_tbx" HorizontalAlignment="Left" Height="49" Margin="212,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="496" FontSize="30" KeyDown="search_tbx_KeyDown">
+        <Grid HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="742" Background="White">
+            <Label Content="Search" HorizontalAlignment="Left" Margin="10,14,0,0" VerticalAlignment="Top" Height="72" Width="183" FontWeight="Bold" Background="White" Foreground="#FFBC1F1F" FontSize="48"/>
+            <TextBox Name="search_tbx" HorizontalAlignment="Left" Height="49" Margin="193,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="515" FontSize="30" KeyDown="search_tbx_KeyDown">
             </TextBox>
             <Button Name="search_btn" HorizontalAlignment="Left" Margin="660,34,0,0" VerticalAlignment="Top" Width="46" Height="45" Background="White" BorderBrush="White" Click="search_btn_Click">
                 <fa:ImageAwesome Icon="Search" Width="30" Height="30"/>
             </Button>
         </Grid>
-        <ListView HorizontalAlignment="Left" Height="361" Margin="10,121,0,0" VerticalAlignment="Top" Width="722">
+        <ListView Name="result_ltv"
+                  HorizontalAlignment="Left"
+                  AlternationCount="50"
+                  Height="361" Margin="10,121,0,0"
+                  VerticalAlignment="Top" Width="722">
             <ListView.View>
                 <GridView AllowsColumnReorder="true">
-                    <GridViewColumn  Header="#" Width="22" DisplayMemberBinding="{Binding num}" />
+                    <GridViewColumn  Header="#" Width="22" 
+                                     DisplayMemberBinding = "{Binding (ItemsControl.AlternationIndex),RelativeSource = {RelativeSource AncestorType=ListViewItem}}" />
                     <GridViewColumn  Header="File Name" Width="194" DisplayMemberBinding="{Binding name}" />
                     <GridViewColumn  Header="File Path" Width="500" DisplayMemberBinding="{Binding path}" />
                 </GridView>
             </ListView.View>
         </ListView>
+        <Button Name="openFile_btn" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105" Height="35" Content="Open File" FontSize="16" Margin="0,0,10,10.2" Click="openFile_btn_Click"/>
+
     </Grid>
+
 </Window>

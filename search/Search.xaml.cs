@@ -24,15 +24,20 @@ namespace search
 
         private void search_btn_Click(object sender, RoutedEventArgs e)
         {
-            List<Tuple<string, Tuple<string, string>>> l;
-            List<
+            List<Tuple<string, string>> list;
+            List<listitem> l = new List<listitem>();
             lucene lucenesearch = new lucene();
             lucenesearch.searchStart();
-            l = lucenesearch.lucene_search(search_tbx.Text.ToLower());
-            foreach (var item in l)
+            list = lucenesearch.lucene_search(search_tbx.Text.ToLower());
+            foreach (var item in list)
             {
-                result_tbx.Text += item.Item1 + "\n*************\n" + item.Item2.Item1 + "\n*************\n" + item.Item2.Item2 + "\n";
+                listitem li = new listitem();
+                li.name = item.Item2;
+                li.path = item.Item1;
+                l.Add(li);
             }
+
+            result_ltv.ItemsSource = l;
             lucenesearch.searchClose();
 
         }
@@ -44,13 +49,24 @@ namespace search
                 search_btn_Click(this, e);
             }
         }
+
+        private void openFile_btn_Click(object sender, RoutedEventArgs e)
+        {
+            if ((dynamic)result_ltv.Items.Count != 0)
+            {
+                if ((dynamic)result_ltv.SelectedItems.Count > 0)
+                {
+                    var selectedItem = (dynamic)result_ltv.SelectedItems[0];
+                    if (selectedItem != null)
+                        System.Diagnostics.Process.Start(selectedItem.path);
+                }
+            }
+        }
+
     }
-    public class User
+    public class listitem
     {
-        public string Name { get; set; }
-
-        public int Age { get; set; }
-
-        public string Mail { get; set; }
+        public string name { get; set; }
+        public string path { get; set; }
     }
 }
