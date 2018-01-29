@@ -6,24 +6,20 @@
         xmlns:local="clr-namespace:search"
         xmlns:fa="http://schemas.fontawesome.io/icons/" x:Class="search.Index"
         mc:Ignorable="d"
-        Title="Index"  Height="530.912" Width="748.8">
+        Title="Index"  Height="530.912" Width="769.2">
     <Grid>
-
-        <Grid HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="742" Background="White">
-            <Label Content="Index" HorizontalAlignment="Left" Margin="16,14,0,0" VerticalAlignment="Top" Height="72" Width="149" FontWeight="Bold" Background="White" Foreground="#FFBC1F1F" FontSize="48"/>
-            <TextBox Name="browes_tbx" HorizontalAlignment="Left" Height="49" Margin="170,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="538" FontSize="30" KeyDown="browes_tbx_KeyDown"/>
-            <Button Name="index_btn" HorizontalAlignment="Left" Margin="660,34,0,0" VerticalAlignment="Top" Width="46" Height="45" Background="White" BorderBrush="White" Click="index_btn_Click">
-                <fa:ImageAwesome Icon="ListUl" Width="30" Height="30"/>
-            </Button>
-        </Grid>
+        <Label Content="Index" HorizontalAlignment="Left" Margin="22,14,0,0" VerticalAlignment="Top" Height="72" Width="149" FontWeight="Bold" Background="White" Foreground="#FFBC1F1F" FontSize="48"/>
+        <TextBox Name="browes_tbx" VerticalContentAlignment="Center" HorizontalAlignment="Right" Height="49" Margin="0,32,12.2,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="575" FontSize="20" KeyDown="browes_tbx_KeyDown"/>
+        <Button Name="index_btn" HorizontalAlignment="Right" Margin="0,34,16.2,0" VerticalAlignment="Top" Width="46" Height="45" Background="White" BorderBrush="White" Click="index_btn_Click">
+            <fa:ImageAwesome Icon="ListUl" Width="30" Height="30"/>
+        </Button>
         <TextBox 
-            Name="result_tbx" HorizontalAlignment="Left"
+            Name="result_tbx" HorizontalAlignment="Right"
             IsReadOnly="True"
-            VerticalAlignment="Top" Height="376" Width="732"
+            VerticalAlignment="Bottom" Height="387" Width="732"
             Background="#FF772953" Foreground="White"
-            FontSize="18" Margin="0,116,0,0"
+            FontSize="18" Margin="0,0,12.2,9.6"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
-            ScrollViewer.VerticalScrollBarVisibility="Auto"
             />
 
     </Grid>

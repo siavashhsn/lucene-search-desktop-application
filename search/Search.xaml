@@ -6,20 +6,18 @@
         xmlns:local="clr-namespace:search"
         xmlns:fa="http://schemas.fontawesome.io/icons/" 
         mc:Ignorable="d"
-        Title="Search"  Height="568.8" Width="746.4">
+        Title="Search"  Height="568.8" Width="756.4">
     <Grid>
-        <Grid HorizontalAlignment="Left" Height="116" VerticalAlignment="Top" Width="742" Background="White">
-            <Label Content="Search" HorizontalAlignment="Left" Margin="10,14,0,0" VerticalAlignment="Top" Height="72" Width="183" FontWeight="Bold" Background="White" Foreground="#FFBC1F1F" FontSize="48"/>
-            <TextBox Name="search_tbx" HorizontalAlignment="Left" Height="49" Margin="193,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="515" FontSize="30" KeyDown="search_tbx_KeyDown">
-            </TextBox>
-            <Button Name="search_btn" HorizontalAlignment="Left" Margin="660,34,0,0" VerticalAlignment="Top" Width="46" Height="45" Background="White" BorderBrush="White" Click="search_btn_Click">
-                <fa:ImageAwesome Icon="Search" Width="30" Height="30"/>
-            </Button>
-        </Grid>
+        <Label Content="Search" HorizontalAlignment="Left" Margin="14,12,0,0" VerticalAlignment="Top" Height="72" Width="183" FontWeight="Bold" Background="White" Foreground="#FFBC1F1F" FontSize="48"/>
+        <TextBox Name="search_tbx" HorizontalAlignment="Right"  VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Height="49" Margin="0,30,10.6,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="539" FontSize="20" KeyDown="search_tbx_KeyDown">
+        </TextBox>
+        <Button Name="search_btn" HorizontalAlignment="Left" Margin="682,32,0,0" VerticalAlignment="Top" Width="46" Height="45" Background="White" BorderBrush="White" Click="search_btn_Click">
+            <fa:ImageAwesome Icon="Search" Width="30" Height="30"/>
+        </Button>
         <ListView Name="result_ltv"
-                  HorizontalAlignment="Left"
+                  HorizontalAlignment="Right"
                   AlternationCount="50"
-                  Height="361" Margin="10,121,0,0"
+                  Height="380" Margin="10,100,8,0"
                   VerticalAlignment="Top" Width="722">
             <ListView.View>
                 <GridView AllowsColumnReorder="true">

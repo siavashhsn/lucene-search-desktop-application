@@ -33,5 +33,10 @@ namespace search
             Index i = new Index();
             i.Show();
         }
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Application.Current.Shutdown();
+        }
     }
 }

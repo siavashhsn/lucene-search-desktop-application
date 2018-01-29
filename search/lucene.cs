@@ -75,7 +75,7 @@ namespace search
         public List<Tuple<string, string>> lucene_search(string query)
         {
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_30, new string[] { "name", "content" }, analyzer);
-            TopDocs resultDocs = searcher.Search(queryParser.Parse(query), 10);
+            TopDocs resultDocs = searcher.Search(queryParser.Parse(query), 100);
             var hits = resultDocs.ScoreDocs;
 
             List<Tuple<string, string>> s = new List<Tuple<string, string>>();

@@ -86,45 +86,60 @@ namespace search
         public Index()
         {
             InitializeComponent();
-            browes_tbx.Text = "C:\\Users\\siavash\\Desktop\\iDesktop\\Sias Files\\";
-            result_tbx.Text = "opening E:\\Sias Files ...\n";
+            browes_tbx.Text = "C:\\Users\\siavash\\Desktop\\iDesktop\\";
+            result_tbx.Text = "opening iDesktop ...\n";
             filename = string.Empty;
             filepath = string.Empty;
         }
 
         public void openFilesToBeIndex()
         {
+            index_btn.IsEnabled = false;
             bool result = false;
-            foreach (string file in Directory.EnumerateFiles(browes_tbx.Text))
+            string[] entries = Directory.GetFileSystemEntries(browes_tbx.Text, "*", SearchOption.AllDirectories);
+            foreach (string file in entries)
             {
-                fileContent.Clear();
-                filename = string.Empty;
-                filepath = string.Empty;
-
-                if (readableFormats.Any(Path.GetExtension(file).Contains))
+                if (File.Exists(file))
                 {
-                    switch (Path.GetExtension(file))
+                    fileContent.Clear();
+                    filename = string.Empty;
+                    filepath = string.Empty;
+
+                    if (readableFormats.Any(Path.GetExtension(file).Contains))
                     {
-                        case ".doc": { wordReader(file); break; }
-                        case ".docx": { wordReader(file); break; }
-                        case ".pdf": { pdfReader(file); break; }
-                        case ".ppt": { pptReader(file); break; }
-                        case ".xls": { xlsxReader(file); break; }
-                        case ".xlsx": { xlsxReader(file); break; }
-                        default: { txtReader(file); break; }
+                        switch (Path.GetExtension(file))
+                        {
+                            case ".doc": { wordReader(file); break; }
+                            case ".docx": { wordReader(file); break; }
+                            case ".pdf": { pdfReader(file); break; }
+                            case ".ppt": { pptReader(file); break; }
+                            case ".xls": { xlsxReader(file); break; }
+                            case ".xlsx": { xlsxReader(file); break; }
+                            default: { txtReader(file); break; }
+                        }
                     }
-                }
-                else
-                {
-                    fileContent.Append("");
-                }
+                    else
+                    {
+                        fileContent.Append("");
+                    }
 
-                filename = Path.GetFileName(file);
-                filepath = file;
+                    filename = Path.GetFileName(file);
+                    filepath = file;
 
-                result = index.lucene_index(filepath, filename, fileContent);
-                result_tbx.Text += file + "\t\t\t\t" + result + "\n";
+                    result = index.lucene_index(filepath, filename, fileContent);
+                    show(result);
+                    result_tbx.ScrollToEnd();
+                }
             }
+        }
+
+        public void show(bool r)
+        {
+            if (r)
+                result_tbx.Text += "Indexed \t" + filename + "\n";
+            else
+                result_tbx.Text += "not Indexed \t" + filename + "\n";
+
         }
 
         public void wordReader(string path)
@@ -188,6 +203,7 @@ namespace search
 
                 result_tbx.Text += "\n...................done...................\n";
             }
+            return;
         }
 
         private void browes_tbx_KeyDown(object sender, KeyEventArgs e)
