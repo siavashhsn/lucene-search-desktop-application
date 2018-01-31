@@ -27,51 +27,51 @@ namespace search
         private Thread openfilethread;
 
 
-        public static string[] vidioAudioFormats = new[]
-        {
-            ".webm", ".mpg", ".mp2", ".mpeg", ".mpe",
-            ".mpv", ".ogg", ".mp4", ".m4p", ".m4v",
-            ".mp3", ".m4a", ".aac", ".oga"
-        };
+        //public static string[] vidioAudioFormats = new[]
+        //{
+        //    ".webm", ".mpg", ".mp2", ".mpeg", ".mpe",
+        //    ".mpv", ".ogg", ".mp4", ".m4p", ".m4v",
+        //    ".mp3", ".m4a", ".aac", ".oga"
+        //};
 
-        public static string[] imageformats = new[]
-        {
-            ".ani", ".bmp", ".cal", ".eps", ".fax",
-            ".img", ".jbg", ".jpe", ".jpeg", "jpg",
-            ".mac", ".pbm", ".pcd", ".pcx", ".pct",
-            ".pgm", ".png", ".ppm", ".psd", ".ras",
-            ".tga", ".tiff", ".wmf", ".gif"
-        };
+        //public static string[] imageformats = new[]
+        //{
+        //    ".ani", ".bmp", ".cal", ".eps", ".fax",
+        //    ".img", ".jbg", ".jpe", ".jpeg", "jpg",
+        //    ".mac", ".pbm", ".pcd", ".pcx", ".pct",
+        //    ".pgm", ".png", ".ppm", ".psd", ".ras",
+        //    ".tga", ".tiff", ".wmf", ".gif"
+        //};
 
-        public static string[] archiveformats = new[]
-        {
-            ".bz2",".F",".gz",".lz",".lzma",".lzo",
-            ".rz",".sz",".xz",".z",".7z",".s7z",
-            ".ace",".afa",".apk",".pak",".rar",
-            ".zip",".zipx",".APK", ".deb",".RPM",
-            ".MSI" ,".JAR",".tar.gz", ".tgz",
-            ".tar.Z", ".tar.bz2",".tbz2", ".tar.lzma",
-            ".tlz" ,".tar.xz", ".txz"
-        };
+        //public static string[] archiveformats = new[]
+        //{
+        //    ".bz2",".F",".gz",".lz",".lzma",".lzo",
+        //    ".rz",".sz",".xz",".z",".7z",".s7z",
+        //    ".ace",".afa",".apk",".pak",".rar",
+        //    ".zip",".zipx",".APK", ".deb",".RPM",
+        //    ".MSI" ,".JAR",".tar.gz", ".tgz",
+        //    ".tar.Z", ".tar.bz2",".tbz2", ".tar.lzma",
+        //    ".tlz" ,".tar.xz", ".txz"
+        //};
 
-        public static string[] UnreadableFormats = new[]
-        {
-            ".webm", ".mpg", ".mp2", ".mpeg", ".mpe",
-            ".mpv", ".ogg", ".mp4", ".m4p", ".m4v",
-            ".mp3", ".m4a", ".aac", ".oga",
-            ".ani", ".bmp", ".cal", ".eps", ".fax",
-            ".img", ".jbg", ".jpe", ".jpeg", "jpg",
-            ".mac", ".pbm", ".pcd", ".pcx", ".pct",
-            ".pgm", ".png", ".ppm", ".psd", ".ras",
-            ".tga", ".tiff", ".wmf", ".gif",
-            ".bz2",".F",".gz",".lz",".lzma",".lzo",
-            ".rz",".sz",".xz",".z",".7z",".s7z",
-            ".ace",".afa",".apk",".pak",".rar",
-            ".zip",".zipx",".APK", ".deb",".RPM",
-            ".MSI" ,".JAR",".tar.gz", ".tgz",
-            ".tar.Z", ".tar.bz2",".tbz2", ".tar.lzma",
-            ".tlz" ,".tar.xz", ".txz"
-        };
+        //public static string[] UnreadableFormats = new[]
+        //{
+        //    ".webm", ".mpg", ".mp2", ".mpeg", ".mpe",
+        //    ".mpv", ".ogg", ".mp4", ".m4p", ".m4v",
+        //    ".mp3", ".m4a", ".aac", ".oga",
+        //    ".ani", ".bmp", ".cal", ".eps", ".fax",
+        //    ".img", ".jbg", ".jpe", ".jpeg", "jpg",
+        //    ".mac", ".pbm", ".pcd", ".pcx", ".pct",
+        //    ".pgm", ".png", ".ppm", ".psd", ".ras",
+        //    ".tga", ".tiff", ".wmf", ".gif",
+        //    ".bz2",".F",".gz",".lz",".lzma",".lzo",
+        //    ".rz",".sz",".xz",".z",".7z",".s7z",
+        //    ".ace",".afa",".apk",".pak",".rar",
+        //    ".zip",".zipx",".APK", ".deb",".RPM",
+        //    ".MSI" ,".JAR",".tar.gz", ".tgz",
+        //    ".tar.Z", ".tar.bz2",".tbz2", ".tar.lzma",
+        //    ".tlz" ,".tar.xz", ".txz"
+        //};
 
         public static string[] readableFormats = new[]
         {
@@ -102,51 +102,53 @@ namespace search
         {
             index.indexStart();
 
-            MainThread.Send((object state) =>
+            //MainThread.Send((object state) =>
+            //{
+
+            index_btn.IsEnabled = false;
+            bool result = false;
+            //uac
+            string[] entries = Directory.GetFileSystemEntries(browes_tbx.Text, "*", SearchOption.AllDirectories);
+            foreach (string file in entries)
             {
-
-                index_btn.IsEnabled = false;
-                bool result = false;
-
-                string[] entries = Directory.GetFileSystemEntries(browes_tbx.Text, "*", SearchOption.AllDirectories);
-                foreach (string file in entries)
+                if (File.Exists(file))
                 {
-                    if (File.Exists(file))
+                    fileContent.Clear();
+                    filename = string.Empty;
+                    filepath = string.Empty;
+
+                    if (readableFormats.Any(Path.GetExtension(file).Contains))
                     {
-                        fileContent.Clear();
-                        filename = string.Empty;
-                        filepath = string.Empty;
-
-                        if (readableFormats.Any(Path.GetExtension(file).Contains))
-                        {
-                            string fx = Path.GetExtension(file);
-                            if (fx == ".doc") { wordReader(file); }
-                            else if (fx == ".docx") { wordReader(file); }
-                            else if (fx == ".pdf") { pdfReader(file); }
-                            else if (fx == ".ppt") { pptReader(file); }
-                            else if (fx == ".xls") { xlsxReader(file); }
-                            else if (fx == ".xlsx") { xlsxReader(file); }
-                            else { txtReader(file); }
-                        }
+                        string fx = Path.GetExtension(file);
+                        if (fx == ".doc") { wordReader(file); }
+                        else if (fx == ".docx") { wordReader(file); }
+                        else if (fx == ".pdf") { pdfReader(file); }
+                        else if (fx == ".ppt") { pptReader(file); }
+                        else if (fx == ".xls") { xlsxReader(file); }
+                        else if (fx == ".xlsx") { xlsxReader(file); }
+                        else { txtReader(file); }
                     }
-                    else
-                    {
-                        fileContent.Append("");
-                    }
-
-                    filename = Path.GetFileName(file);
-                    filepath = file;
-
-
-                    result = index.lucene_index(filepath, filename, fileContent);
-
-                    if (result)
-                        result_tbx.Text += "Indexed \t" + filename + "\n";
-                    else
-                        result_tbx.Text += "not Indexed \t" + filename + "\n";
-                    result_tbx.ScrollToEnd();
                 }
-            }, null);
+                else
+                {
+                    fileContent.Append("");
+                }
+
+                filename = Path.GetFileName(file);
+                filepath = file;
+
+
+                result = index.lucene_index(filepath, filename, fileContent);
+                //MainThread.Send((object state) =>
+                //{
+
+                if (result)
+                    result_tbx.Text += "Indexed \t" + filename + "\n";
+                else
+                    result_tbx.Text += "not Indexed \t" + filename + "\n";
+                result_tbx.ScrollToEnd();
+            }
+            //}, result);
             index.indexClose();
         }
 
@@ -220,8 +222,9 @@ namespace search
             }
             else
             {
-                openfilethread = new Thread(new ThreadStart(openFilesToBeIndex));
-                openfilethread.Start();
+                openFilesToBeIndex();
+                //openfilethread = new Thread(new ThreadStart(openFilesToBeIndex));
+                //openfilethread.Start();
                 result_tbx.Text += "\n...................done...................\n";
             }
             return;
