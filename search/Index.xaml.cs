@@ -148,25 +148,46 @@ namespace search
 
         public void wordReader(string path)
         {
-            TextExtractor extractor = new TextExtractor(path);
-            fileContent.Append(extractor.ExtractText());
+            try
+            {
+                TextExtractor extractor = new TextExtractor(path);
+                fileContent.Append(extractor.ExtractText());
+            }
+            catch(Exception ex)
+            {
+                fileContent.Append("");
+            }
         }
 
         public void pdfReader(string path)
         {
-            PdfReader reader = new PdfReader(path);
-            for (int page = 1; page <= reader.NumberOfPages; page++)
+            try
             {
-                fileContent.Append(PdfTextExtractor.GetTextFromPage(reader, page));
+                PdfReader reader = new PdfReader(path);
+                for (int page = 1; page <= reader.NumberOfPages; page++)
+                {
+                    fileContent.Append(PdfTextExtractor.GetTextFromPage(reader, page));
+                }
+                reader.Close();
             }
-            reader.Close();
+            catch (Exception ex)
+            {
+                fileContent.Append("");
+            }
         }
 
         public void txtReader(string path)
         {
-            using (StreamReader reader = new StreamReader(path))
+            try
             {
-                fileContent.Append(reader.ReadToEnd());
+                using (StreamReader reader = new StreamReader(path))
+                {
+                    fileContent.Append(reader.ReadToEnd());
+                }
+            }
+            catch (Exception ex)
+            {
+                fileContent.Append("");
             }
         }
 
@@ -190,24 +211,14 @@ namespace search
             }
             else
             {
-                //openFilesToBeIndex();
                 index.indexStart();
                 index_btn.IsEnabled = false;
                 bool result = false;
-
-                //AddDirectorySecurity("E:\\", @"DESKTOP-EISOO18\SIAVASH", FileSystemRights.ReadData, AccessControlType.Allow);
                 string path = browes_tbx.Text;
                 await Task.Run(() =>
                 {
                     try
                     {
-
-
-
-                        //AddDirectorySecurity(browes_tbx.Text, @"SIAVASH", FileSystemRights.ReadData, AccessControlType.Allow);
-                        //string[] entries = Directory.GetFileSystemEntries
-                        //       (tb, "*.*", SearchOption.AllDirectories);
-
                         Queue<string> queue = new Queue<string>();
                         queue.Enqueue(path);
                         while (queue.Count > 0)
@@ -235,27 +246,34 @@ namespace search
                             {
                                 foreach (string file in files)
                                 {
-                                    fileContent.Clear();
-
-                                    filename = string.Empty;
-                                    filepath = string.Empty;
-                                    if (readableFormatsList.Contains(Path.GetExtension(file)))
+                                    try
                                     {
-                                        string fx = Path.GetExtension(file);
-                                        if (fx == ".doc") { wordReader(file); }
-                                        else if (fx == ".docx") { wordReader(file); }
-                                        else if (fx == ".pdf") { pdfReader(file); }
-                                        else { txtReader(file); }
-                                    }
+                                        fileContent.Clear();
 
-                                    else
-                                    {
-                                        fileContent.Append("");
+                                        filename = string.Empty;
+                                        filepath = string.Empty;
+
+                                        if ( readableFormatsList.Contains(Path.GetExtension(file)) && file.Length < (100)*(1024*1024))
+                                        {
+                                            string fx = Path.GetExtension(file);
+                                            if (fx == ".doc") { wordReader(file); }
+                                            else if (fx == ".docx") { wordReader(file); }
+                                            else if (fx == ".pdf") { pdfReader(file); }
+                                            else { txtReader(file); }
+                                        }
+                                        else
+                                        {
+                                            fileContent.Append("");
+                                        }
+                                        filename = Path.GetFileName(file);
+                                        filepath = file;
+                                        result = index.lucene_index(filepath, filename, fileContent);
+                                        updateResultTextBox(filename);
                                     }
-                                    filename = Path.GetFileName(file);
-                                    filepath = file;
-                                    result = index.lucene_index(filepath, filename, fileContent);
-                                    updateResultTextBox(filename);
+                                    catch (Exception eee)
+                                    {
+                                        MessageBox.Show($"{filepath}---{eee.Message}");
+                                    }
                                 }
                             }
                         }
