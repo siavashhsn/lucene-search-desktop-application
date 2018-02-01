@@ -18,8 +18,7 @@ using Lucene.Net.QueryParsers;
 namespace search
 {
     class lucene
-    {
-
+    { 
         private static Analyzer analyzer;
         private static Directory directory;
         private static IndexWriter writer;
@@ -67,7 +66,7 @@ namespace search
             }
             catch (Exception e)
             {
-                MessageBox.Show(path + " can't be index...???!!!");
+                MessageBox.Show(e.Message.ToString());
                 return false;
             }
         }
@@ -76,7 +75,8 @@ namespace search
         {
             try
             {
-                MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_30, new string[] { "name", "content" }, analyzer);
+                MultiFieldQueryParser queryParser = new MultiFieldQueryParser
+                    (Version.LUCENE_30, new string[] { "name", "content" }, analyzer);
                 TopDocs resultDocs = searcher.Search(queryParser.Parse(query), 100);
                 var hits = resultDocs.ScoreDocs;
 
@@ -91,7 +91,7 @@ namespace search
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.ToString());
+                MessageBox.Show(e.Message.ToString());
                 return null;
             }
         }

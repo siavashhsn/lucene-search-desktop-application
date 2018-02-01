@@ -66,6 +66,18 @@ namespace search
             }
         }
 
+        private void openFolder_btn_Click(object sender, RoutedEventArgs e)
+        {
+            if ((dynamic)result_ltv.Items.Count != 0)
+            {
+                if ((dynamic)result_ltv.SelectedItems.Count > 0)
+                {
+                    var selectedItem = (dynamic)result_ltv.SelectedItems[0];
+                    if (selectedItem != null)
+                        System.Diagnostics.Process.Start("explorer.exe", "/select," + selectedItem.path);
+                }
+            }
+        }
     }
     public class listitem
     {

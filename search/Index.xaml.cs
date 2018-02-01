@@ -12,6 +12,9 @@ using iTextSharp.text.pdf.parser;
 using Code7248.word_reader;
 using System.Text;
 using System.Threading;
+using System.Security.AccessControl;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace search
 {
@@ -23,8 +26,7 @@ namespace search
         public static StringBuilder fileContent = new StringBuilder();
         public static string filename;
         public static string filepath;
-        private SynchronizationContext MainThread;
-        private Thread openfilethread;
+        private readonly SynchronizationContext sync;
 
 
         //public static string[] vidioAudioFormats = new[]
@@ -84,88 +86,65 @@ namespace search
             ".php3", ".php4", ".php5", ".phps", ".phtml",
             ".json", ".asp", ".aspx", ".l"
         };
+        public static List<string> readableFormatsList = new List<string>(readableFormats);
 
         lucene index = new lucene();
 
         public Index()
         {
             InitializeComponent();
-            browes_tbx.Text = "C:\\Users\\siavash\\Desktop\\iDesktop\\";
-            result_tbx.Text = "opening iDesktop ...\n";
+            sync = SynchronizationContext.Current;
+            browes_tbx.Text = "E:\\";
+            result_tbx.Text = "opening ...\n";
             filename = string.Empty;
             filepath = string.Empty;
-            MainThread = SynchronizationContext.Current;
-            if (MainThread == null) MainThread = new SynchronizationContext();
         }
 
-        public void openFilesToBeIndex()
+
+        public static void AddDirectorySecurity(string FileName, string Account, FileSystemRights Rights, AccessControlType ControlType)
         {
-            index.indexStart();
+            // Create a new DirectoryInfo object.
+            DirectoryInfo dInfo = new DirectoryInfo(FileName);
 
-            //MainThread.Send((object state) =>
-            //{
+            // Get a DirectorySecurity object that represents the 
+            // current security settings.
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
 
-            index_btn.IsEnabled = false;
-            bool result = false;
-            //uac
-            string[] entries = Directory.GetFileSystemEntries(browes_tbx.Text, "*", SearchOption.AllDirectories);
-            foreach (string file in entries)
-            {
-                if (File.Exists(file))
-                {
-                    fileContent.Clear();
-                    filename = string.Empty;
-                    filepath = string.Empty;
+            // Add the FileSystemAccessRule to the security settings. 
+            dSecurity.AddAccessRule(new FileSystemAccessRule(Account,
+                                                            Rights,
+                                                            ControlType));
 
-                    if (readableFormats.Any(Path.GetExtension(file).Contains))
-                    {
-                        string fx = Path.GetExtension(file);
-                        if (fx == ".doc") { wordReader(file); }
-                        else if (fx == ".docx") { wordReader(file); }
-                        else if (fx == ".pdf") { pdfReader(file); }
-                        else if (fx == ".ppt") { pptReader(file); }
-                        else if (fx == ".xls") { xlsxReader(file); }
-                        else if (fx == ".xlsx") { xlsxReader(file); }
-                        else { txtReader(file); }
-                    }
-                }
-                else
-                {
-                    fileContent.Append("");
-                }
+            // Set the new access settings.
+            dInfo.SetAccessControl(dSecurity);
 
-                filename = Path.GetFileName(file);
-                filepath = file;
-
-
-                result = index.lucene_index(filepath, filename, fileContent);
-                //MainThread.Send((object state) =>
-                //{
-
-                if (result)
-                    result_tbx.Text += "Indexed \t" + filename + "\n";
-                else
-                    result_tbx.Text += "not Indexed \t" + filename + "\n";
-                result_tbx.ScrollToEnd();
-            }
-            //}, result);
-            index.indexClose();
         }
 
-
-        public void show(bool r)
+        // Removes an ACL entry on the specified directory for the specified account.
+        public static void RemoveDirectorySecurity(string FileName, string Account, FileSystemRights Rights, AccessControlType ControlType)
         {
-            MainThread.Send((object state) =>
-            {
-                if (r)
-                    result_tbx.Text += "Indexed \t" + filename + "\n";
-                else
-                    result_tbx.Text += "not Indexed \t" + filename + "\n";
-                result_tbx.ScrollToEnd();
+            // Create a new DirectoryInfo object.
+            DirectoryInfo dInfo = new DirectoryInfo(FileName);
 
-            }, r);
+            // Get a DirectorySecurity object that represents the 
+            // current security settings.
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+
+            // Add the FileSystemAccessRule to the security settings. 
+            dSecurity.RemoveAccessRule(new FileSystemAccessRule(Account,
+                                                            Rights,
+                                                            ControlType));
+
+            // Set the new access settings.
+            dInfo.SetAccessControl(dSecurity);
 
         }
+
+        //domain DESKTOP-EISOO18
+        //account siavash
+
+    
+
 
         public void wordReader(string path)
         {
@@ -183,20 +162,8 @@ namespace search
             reader.Close();
         }
 
-        public void pptReader(string path)
-        {
-            result_tbx.Text += "still in process ... ";
-        }
-
-        public void xlsxReader(string path)
-        {
-            result_tbx.Text += "still in process ... ";
-        }
-
         public void txtReader(string path)
         {
-            //used from this side 
-            //https://www.dotnetperls.com/file-readalltext
             using (StreamReader reader = new StreamReader(path))
             {
                 fileContent.Append(reader.ReadToEnd());
@@ -208,8 +175,9 @@ namespace search
             result_tbx.Text += string.Format("\n***********{0}***********\n\n{1}\n", name, fileContent);
         }
 
-        private void index_btn_Click(object sender, RoutedEventArgs e)
+        private async void index_btn_Click(object sender, RoutedEventArgs e)
         {
+
             if (browes_tbx.Text == null)
             {
                 MessageBox.Show("Please select directory path", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -222,12 +190,97 @@ namespace search
             }
             else
             {
-                openFilesToBeIndex();
-                //openfilethread = new Thread(new ThreadStart(openFilesToBeIndex));
-                //openfilethread.Start();
-                result_tbx.Text += "\n...................done...................\n";
+                //openFilesToBeIndex();
+                index.indexStart();
+                index_btn.IsEnabled = false;
+                bool result = false;
+
+                //AddDirectorySecurity("E:\\", @"DESKTOP-EISOO18\SIAVASH", FileSystemRights.ReadData, AccessControlType.Allow);
+                string path = browes_tbx.Text;
+                await Task.Run(() =>
+                {
+                    try
+                    {
+
+
+
+                        //AddDirectorySecurity(browes_tbx.Text, @"SIAVASH", FileSystemRights.ReadData, AccessControlType.Allow);
+                        //string[] entries = Directory.GetFileSystemEntries
+                        //       (tb, "*.*", SearchOption.AllDirectories);
+
+                        Queue<string> queue = new Queue<string>();
+                        queue.Enqueue(path);
+                        while (queue.Count > 0)
+                        {
+                            path = queue.Dequeue();
+                            try
+                            {
+                                foreach (string subDir in Directory.GetDirectories(path))
+                                {
+                                    queue.Enqueue(subDir);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+                            string[] files = null;
+                            try
+                            {
+                                files = Directory.GetFiles(path);
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+                            if (files != null)
+                            {
+                                foreach (string file in files)
+                                {
+                                    fileContent.Clear();
+
+                                    filename = string.Empty;
+                                    filepath = string.Empty;
+                                    if (readableFormatsList.Contains(Path.GetExtension(file)))
+                                    {
+                                        string fx = Path.GetExtension(file);
+                                        if (fx == ".doc") { wordReader(file); }
+                                        else if (fx == ".docx") { wordReader(file); }
+                                        else if (fx == ".pdf") { pdfReader(file); }
+                                        else { txtReader(file); }
+                                    }
+
+                                    else
+                                    {
+                                        fileContent.Append("");
+                                    }
+                                    filename = Path.GetFileName(file);
+                                    filepath = file;
+                                    result = index.lucene_index(filepath, filename, fileContent);
+                                    updateResultTextBox(filename);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        MessageBox.Show(ee.Message.ToString());
+                    }
+                    //RemoveDirectorySecurity(browes_tbx.Text, @"SIAVASH", FileSystemRights.ReadData, AccessControlType.Allow);
+
+                    index.indexClose();
+                });
             }
-            return;
+            
+            result_tbx.Text += "\n...................done...................\n";
+            result_tbx.ScrollToEnd();
+        }
+
+        private void updateResultTextBox(string _filename)
+        {
+            sync.Post(new SendOrPostCallback(o =>
+            {
+                result_tbx.Text += "Indexed \t" + (string)o + "\n";
+                result_tbx.ScrollToEnd();
+            }), _filename);
         }
 
         private void browes_tbx_KeyDown(object sender, KeyEventArgs e)

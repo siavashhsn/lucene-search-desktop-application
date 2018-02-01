@@ -29,6 +29,7 @@
             </ListView.View>
         </ListView>
         <Button Name="openFile_btn" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105" Height="35" Content="Open File" FontSize="16" Margin="0,0,10,10.2" Click="openFile_btn_Click"/>
+        <Button Name="openfolder_btn" Click="openFolder_btn_Click" Content="Open Folder" FontSize="16"  HorizontalAlignment="Left" Margin="16,0,0,10.2" VerticalAlignment="Bottom" Width="107" Height="35"/>
 
     </Grid>
 
