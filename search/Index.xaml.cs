@@ -101,51 +101,6 @@ namespace search
         }
 
 
-        public static void AddDirectorySecurity(string FileName, string Account, FileSystemRights Rights, AccessControlType ControlType)
-        {
-            // Create a new DirectoryInfo object.
-            DirectoryInfo dInfo = new DirectoryInfo(FileName);
-
-            // Get a DirectorySecurity object that represents the 
-            // current security settings.
-            DirectorySecurity dSecurity = dInfo.GetAccessControl();
-
-            // Add the FileSystemAccessRule to the security settings. 
-            dSecurity.AddAccessRule(new FileSystemAccessRule(Account,
-                                                            Rights,
-                                                            ControlType));
-
-            // Set the new access settings.
-            dInfo.SetAccessControl(dSecurity);
-
-        }
-
-        // Removes an ACL entry on the specified directory for the specified account.
-        public static void RemoveDirectorySecurity(string FileName, string Account, FileSystemRights Rights, AccessControlType ControlType)
-        {
-            // Create a new DirectoryInfo object.
-            DirectoryInfo dInfo = new DirectoryInfo(FileName);
-
-            // Get a DirectorySecurity object that represents the 
-            // current security settings.
-            DirectorySecurity dSecurity = dInfo.GetAccessControl();
-
-            // Add the FileSystemAccessRule to the security settings. 
-            dSecurity.RemoveAccessRule(new FileSystemAccessRule(Account,
-                                                            Rights,
-                                                            ControlType));
-
-            // Set the new access settings.
-            dInfo.SetAccessControl(dSecurity);
-
-        }
-
-        //domain DESKTOP-EISOO18
-        //account siavash
-
-    
-
-
         public void wordReader(string path)
         {
             try
@@ -172,6 +127,7 @@ namespace search
             }
             catch (Exception ex)
             {
+                MessageBox.Show(path);
                 fileContent.Append("");
             }
         }
@@ -215,45 +171,47 @@ namespace search
                 index_btn.IsEnabled = false;
                 bool result = false;
                 string path = browes_tbx.Text;
-                await Task.Run(() =>
+                //await Task.Run(() =>
+                //{
+                try
                 {
-                    try
+                    Queue<string> queue = new Queue<string>();
+                    queue.Enqueue(path);
+                    while (queue.Count > 0)
                     {
-                        Queue<string> queue = new Queue<string>();
-                        queue.Enqueue(path);
-                        while (queue.Count > 0)
+                        path = queue.Dequeue();
+                        try
                         {
-                            path = queue.Dequeue();
-                            try
+                            foreach (string subDir in Directory.GetDirectories(path))
                             {
-                                foreach (string subDir in Directory.GetDirectories(path))
-                                {
+                                if (subDir != @"E:\$RECYCLE.BIN" && subDir != @"E:\System Volume Information" && subDir != @"E:\.Trash-1000")
                                     queue.Enqueue(subDir);
-                                }
                             }
-                            catch (Exception ex)
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                        string[] files = null;
+                        try
+                        {
+                            files = Directory.GetFiles(path);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                        if (files != null)
+                        {
+                            foreach (string file in files)
                             {
-                            }
-                            string[] files = null;
-                            try
-                            {
-                                files = Directory.GetFiles(path);
-                            }
-                            catch (Exception ex)
-                            {
-                            }
-                            if (files != null)
-                            {
-                                foreach (string file in files)
+                                try
                                 {
-                                    try
-                                    {
+                                   
                                         fileContent.Clear();
 
                                         filename = string.Empty;
                                         filepath = string.Empty;
 
-                                        if ( readableFormatsList.Contains(Path.GetExtension(file)) && file.Length < (100)*(1024*1024))
+                                        if (readableFormatsList.Contains(Path.GetExtension(file)) && file.Length < (100) * (1024 * 1024))
                                         {
                                             string fx = Path.GetExtension(file);
                                             if (fx == ".doc") { wordReader(file); }
@@ -265,29 +223,35 @@ namespace search
                                         {
                                             fileContent.Append("");
                                         }
+
                                         filename = Path.GetFileName(file);
                                         filepath = file;
-                                        result = index.lucene_index(filepath, filename, fileContent);
-                                        updateResultTextBox(filename);
-                                    }
-                                    catch (Exception eee)
+
+                                    await Task.Run(() =>
                                     {
-                                        MessageBox.Show($"{filepath}---{eee.Message}");
-                                    }
+                                        result = index.lucene_index(filepath, filename, fileContent);
+
+                                        updateResultTextBox(filename);
+                                        Task.Delay(1000);
+                                    });
+
+                                }
+                                catch (Exception eee)
+                                {
+                                    MessageBox.Show($"{filepath}---{eee.Message}");
                                 }
                             }
                         }
                     }
-                    catch (Exception ee)
-                    {
-                        MessageBox.Show(ee.Message.ToString());
-                    }
-                    //RemoveDirectorySecurity(browes_tbx.Text, @"SIAVASH", FileSystemRights.ReadData, AccessControlType.Allow);
-
-                    index.indexClose();
-                });
+                }
+                catch (Exception ee)
+                {
+                    MessageBox.Show(ee.Message.ToString());
+                }
+                index.indexClose();
+                //});
             }
-            
+
             result_tbx.Text += "\n...................done...................\n";
             result_tbx.ScrollToEnd();
         }
@@ -310,3 +274,5 @@ namespace search
         }
     }
 }
+
+
