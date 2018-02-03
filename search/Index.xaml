@@ -20,7 +20,7 @@
             Name="result_tbx" HorizontalAlignment="Right"
             IsReadOnly="True"
             VerticalAlignment="Bottom" Height="387" Width="732"
-            Background="#FF772953" Foreground="White"
+            Background="Black" Foreground="#FF41F31E"
             FontSize="18" Margin="0,0,12.2,9.6"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             />

@@ -27,6 +27,8 @@ namespace search
         public static string filename;
         public static string filepath;
         private readonly SynchronizationContext sync;
+        private DateTime dt = DateTime.Now;
+
 
 
         //public static string[] vidioAudioFormats = new[]
@@ -205,34 +207,35 @@ namespace search
                             {
                                 try
                                 {
-                                   
-                                        fileContent.Clear();
 
-                                        filename = string.Empty;
-                                        filepath = string.Empty;
+                                    fileContent.Clear();
 
-                                        if (readableFormatsList.Contains(Path.GetExtension(file)) && file.Length < (100) * (1024 * 1024))
-                                        {
-                                            string fx = Path.GetExtension(file);
-                                            if (fx == ".doc") { wordReader(file); }
-                                            else if (fx == ".docx") { wordReader(file); }
-                                            else if (fx == ".pdf") { pdfReader(file); }
-                                            else { txtReader(file); }
-                                        }
-                                        else
-                                        {
-                                            fileContent.Append("");
-                                        }
+                                    filename = string.Empty;
+                                    filepath = string.Empty;
 
-                                        filename = Path.GetFileName(file);
-                                        filepath = file;
+                                    if (readableFormatsList.Contains(Path.GetExtension(file)) && file.Length < (100) * (1024 * 1024))
+                                    {
+                                        string fx = Path.GetExtension(file);
+                                        if (fx == ".doc") { wordReader(file); }
+                                        else if (fx == ".docx") { wordReader(file); }
+                                        else if (fx == ".pdf") { pdfReader(file); }
+                                        else { txtReader(file); }
+                                    }
+                                    else
+                                    {
+                                        fileContent.Append("");
+                                    }
+
+                                    filename = Path.GetFileName(file);
+                                    filepath = file;
 
                                     await Task.Run(() =>
                                     {
                                         result = index.lucene_index(filepath, filename, fileContent);
 
                                         updateResultTextBox(filename);
-                                        Task.Delay(1000);
+                                       
+
                                     });
 
                                 }
@@ -255,14 +258,31 @@ namespace search
             result_tbx.Text += "\n...................done...................\n";
             result_tbx.ScrollToEnd();
         }
+        public int i = 0;
 
         private void updateResultTextBox(string _filename)
         {
+            var timeNow = DateTime.Now;
+            
+            //Here we only refresh our UI each 50 ms  
+            if ((DateTime.Now - dt).Milliseconds <= 50) return;
             sync.Post(new SendOrPostCallback(o =>
             {
-                result_tbx.Text += "Indexed \t" + (string)o + "\n";
+                if (result_tbx.LineCount%200==0)
+                {
+                    var txt = "";
+                    for(int j=result_tbx.LineCount-14; j<result_tbx.LineCount; j++)
+                    {
+                        txt += result_tbx.GetLineText(j);
+                    }
+                    result_tbx.Text = txt;
+                }
+                result_tbx.Text += (i++).ToString() +  " Indexed \t" + (string)o + "\n";
                 result_tbx.ScrollToEnd();
+
             }), _filename);
+            dt = timeNow;
+
         }
 
         private void browes_tbx_KeyDown(object sender, KeyEventArgs e)
